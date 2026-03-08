@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Electro Quiz | TECH TONIC 2K26</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Nav -->
+    <nav>
+        <h2>TECH TONIC 2K26</h2>
+        <a href="../event pages/quiz.html" class="back-btn">← Back</a>
+    </nav>
+
+    <!-- ════════════ WELCOME SCREEN ════════════ -->
+    <div id="welcomeScreen" class="screen active">
+        <div class="welcome-hero">
+            <div class="icon">⚡</div>
+            <h1>Electro Quiz</h1>
+            <p class="tagline">Challenge Your Electronics Knowledge</p>
+        </div>
+
+        <div class="card highlight">
+            <div class="card-header">
+                <span class="icon">📝</span>
+                <h2>Enter Details</h2>
+            </div>
+
+            <div class="form-group">
+                <label>Team Name</label>
+                <input type="text" id="teamName" class="form-input" placeholder="Enter your team name"
+                    autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label>Select Round</label>
+                <select id="roundSelect" class="form-input">
+                    <option value="1">Round 1 — 25 MCQ Questions (15 min)</option>
+                    <option value="2">Round 2 — Set 1 — 15 Questions (10 min)</option>
+                    <option value="3">Round 2 — Set 2 — 15 Questions (10 min)</option>
+                </select>
+            </div>
+
+            <button class="btn-primary" onclick="startQuiz()">⚡ Start Quiz</button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="icon">📋</span>
+                <h2>Instructions</h2>
+            </div>
+            <ul style="list-style:none;padding:0">
+                <li
+                    style="position:relative;padding:8px 0 8px 22px;color:#bbb;font-size:0.9rem;line-height:1.6;border-bottom:1px solid rgba(255,255,255,0.04)">
+                    <span style="position:absolute;left:0;color:#d4af37;font-weight:700">▸</span>
+                    Each round has a fixed time limit — timer will auto-submit when expired
+                </li>
+                <li
+                    style="position:relative;padding:8px 0 8px 22px;color:#bbb;font-size:0.9rem;line-height:1.6;border-bottom:1px solid rgba(255,255,255,0.04)">
+                    <span style="position:absolute;left:0;color:#d4af37;font-weight:700">▸</span>
+                    You can navigate between questions using the dots or buttons
+                </li>
+                <li
+                    style="position:relative;padding:8px 0 8px 22px;color:#bbb;font-size:0.9rem;line-height:1.6;border-bottom:1px solid rgba(255,255,255,0.04)">
+                    <span style="position:absolute;left:0;color:#d4af37;font-weight:700">▸</span>
+                    Review your answers after submission — correct answers will be shown
+                </li>
+                <li style="position:relative;padding:8px 0 8px 22px;color:#bbb;font-size:0.9rem;line-height:1.6">
+                    <span style="position:absolute;left:0;color:#d4af37;font-weight:700">▸</span>
+                    No external help or internet browsing allowed during the quiz
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ════════════ LOADING SCREEN ════════════ -->
+    <div id="loadingScreen" class="screen">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p style="color:#aaa;font-size:0.95rem">Loading questions...</p>
+        </div>
+    </div>
+
+    <!-- ════════════ QUIZ SCREEN ════════════ -->
+    <div id="quizScreen" class="screen">
+        <div class="quiz-topbar">
+            <span id="roundBadge" class="round-badge">ROUND 1</span>
+            <div id="timer" class="timer">15:00</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-text">
+                <span>Progress</span>
+                <span id="progressText">1 / 25</span>
+            </div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill" style="width: 4%"></div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div id="questionNumber" class="question-number">QUESTION 1 OF 25</div>
+            <div id="questionText" class="question-text"></div>
+            <div id="optionsGrid" class="options-grid"></div>
+        </div>
+
+        <div class="quiz-nav">
+            <button id="prevBtn" class="btn-nav btn-prev" onclick="goPrev()">← Previous</button>
+            <button id="nextBtn" class="btn-nav btn-next" onclick="goNext()">Next →</button>
+        </div>
+
+        <div id="questionDots" class="question-nav"></div>
+    </div>
+
+    <!-- ════════════ RESULTS SCREEN ════════════ -->
+    <div id="resultsScreen" class="screen">
+        <div class="results-header">
+            <div class="score-circle">
+                <div id="scoreValue" class="score-value">0</div>
+                <div id="scoreTotal" class="score-total">out of 25</div>
+            </div>
+            <h2 style="font-family:'Cinzel',serif;color:#d4af37;font-size:1.4rem;letter-spacing:2px;margin-bottom:5px">
+                Quiz Complete!</h2>
+            <p id="resultRound" style="color:#888;font-size:0.9rem">Round 1</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <div id="statCorrect" class="num" style="color:#4CAF50">0</div>
+                <div class="label">Correct</div>
+            </div>
+            <div class="stat-item">
+                <div id="statWrong" class="num" style="color:#ef4444">0</div>
+                <div class="label">Wrong</div>
+            </div>
+            <div class="stat-item">
+                <div id="statTime" class="num">0m</div>
+                <div class="label">Time</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+            <div class="card-header">
+                <span class="icon">📖</span>
+                <h2>Answer Review</h2>
+            </div>
+            <div id="reviewList"></div>
+        </div>
+
+        <button class="btn-primary" onclick="restartQuiz()" style="margin-top:10px">↺ Take Another Round</button>
+    </div>
+
+    <!-- ════════════ SUBMIT MODAL ════════════ -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Submit Quiz?</h3>
+            <p id="modalMessage">Are you sure you want to submit?</p>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-confirm" onclick="submitQuiz()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <div class="page-footer">TECH TONIC 2K26 — Department of ECE</div>
+
+    <script src="quiz.js"></script>
+</body>
+
+</html>
