@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Quiz Admin | TECH TONIC 2K26</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --dark: #0a0a0a;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(212, 175, 55, 0.15);
+            --success: #4CAF50;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 20% 50%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+                linear-gradient(135deg, #030305 0%, #0a0a12 50%, #050507 100%);
+            z-index: -2;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #111, #0a0a0a);
+            border-bottom: 2px solid var(--gold);
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+
+        .header h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: clamp(14px, 4vw, 22px);
+            letter-spacing: 3px;
+        }
+
+        .header p {
+            font-size: 12px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        /* Login */
+        .login-section {
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+            margin: 40px auto;
+        }
+
+        .login-section input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            text-align: center;
+        }
+
+        .login-section input:focus {
+            border-color: var(--gold);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            background: linear-gradient(135deg, var(--gold), #c9a020);
+            color: #000;
+            font-weight: 700;
+            font-size: 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Main Content */
+        .admin-content {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 15px 60px;
+        }
+
+        .admin-content.visible {
+            display: block;
+        }
+
+        /* Round Control */
+        .round-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .round-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            color: #aaa;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .round-btn:hover {
+            border-color: rgba(212, 175, 55, 0.4);
+            color: #fff;
+        }
+
+        .round-btn.active {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--gold);
+            color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 18px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #888;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .filter-tab.active {
+            background: rgba(212, 175, 55, 0.12);
+            border-color: rgba(212, 175, 55, 0.3);
+            color: var(--gold);
+        }
+
+        /* Leaderboard */
+        .section-title {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 6px;
+        }
+
+        .leaderboard-table th {
+            text-align: left;
+            padding: 10px 14px;
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-table td {
+            padding: 14px;
+            background: var(--card-bg);
+            font-size: 0.88rem;
+            color: #ccc;
+        }
+
+        .leaderboard-table tr td:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .leaderboard-table tr td:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.06);
+            color: #888;
+        }
+
+        .rank-1 {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+
+        .rank-2 {
+            background: rgba(192, 192, 192, 0.2);
+            color: #c0c0c0;
+        }
+
+        .rank-3 {
+            background: rgba(205, 127, 50, 0.2);
+            color: #cd7f32;
+        }
+
+        .team-name {
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .score-cell {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .btn-winner {
+            padding: 6px 14px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-winner:hover {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .btn-winner.selected {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #555;
+        }
+
+        .empty-state .icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .stat-card .label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* Refresh button */
+        .btn-refresh {
+            padding: 8px 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            background: rgba(212, 175, 55, 0.08);
+            color: var(--gold);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-refresh:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .page-footer {
+            text-align: center;
+            padding: 20px;
+            color: #444;
+            font-size: 12px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            z-index: 9999;
+            transition: transform 0.4s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background: rgba(76, 175, 80, 0.9);
+            color: #fff;
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.9);
+            color: #fff;
+        }
+
+        .toast.info {
+            background: rgba(212, 175, 55, 0.9);
+            color: #000;
+        }
+
+        @media(max-width:480px) {
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 15px;
+                letter-spacing: 2px;
+            }
+
+            .leaderboard-table th {
+                font-size: 0.65rem;
+                padding: 8px 10px;
+            }
+
+            .leaderboard-table td {
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+
+            .rank-badge {
+                width: 26px;
+                height: 26px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>⚡ QUIZ ADMIN PANEL</h1>
+        <p>TECH TONIC 2K26 — Electro Quiz Management</p>
+    </div>
+
+    <!-- Login -->
+    <div id="loginSection" class="login-section">
+        <h3 style="font-family:'Cinzel',serif;color:var(--gold);letter-spacing:2px;font-size:1.1rem">🔐 Admin Login</h3>
+        <input type="password" id="adminKey" placeholder="Enter Admin Key"
+            onkeydown="if(event.key==='Enter')adminLogin()">
+        <button class="btn-login" onclick="adminLogin()">Access Panel</button>
+    </div>
+
+    <!-- Admin Content -->
+    <div id="adminContent" class="admin-content">
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="number" id="totalTeams">0</div>
+                <div class="label">Total Teams</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="avgScore">0</div>
+                <div class="label">Avg Score %</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="topScore">0</div>
+                <div class="label">Top Score</div>
+            </div>
+        </div>
+
+        <!-- Round Filter -->
+        <div
+            style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px">
+            <h2 class="section-title" style="margin:0">🏆 Leaderboard</h2>
+            <button class="btn-refresh" onclick="refreshData()">↻ Refresh</button>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterRound(0, this)">All Rounds</button>
+            <button class="filter-tab" onclick="filterRound(1, this)">Round 1</button>
+            <button class="filter-tab" onclick="filterRound(2, this)">R2 Set 1</button>
+            <button class="filter-tab" onclick="filterRound(3, this)">R2 Set 2</button>
+        </div>
+
+        <div id="leaderboardContainer">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Team</th>
+                        <th>Round</th>
+                        <th>Score</th>
+                        <th>Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state">
+                <div class="icon">📋</div>
+                <p>No quiz submissions yet</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <div class="page-footer">TECH TONIC 2K26 — Department of ECE</div>
+
+    <script>
+        // Config
+        const ADMIN_KEY = 'TT26_ADMIN_123';
+
+        // ── Firebase Config — PASTE YOUR CONFIG HERE (same as quiz.js) ──
+        const FIREBASE_CONFIG = {
+            databaseURL: "https://techtonic-quiz-default-rtdb.firebaseio.com"
+        };
+
+        // Results storage — populated from Firebase
+        let allResults = [];
+
+        // Round display names
+        const ROUND_NAMES = { 1: 'R1', 2: 'R2-S1', 3: 'R2-S2' };
+
+        let currentFilter = 0;
+
+        function showToast(msg, type = 'info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = `toast ${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function adminLogin() {
+            const key = document.getElementById('adminKey').value.trim();
+            if (key === ADMIN_KEY) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('adminContent').classList.add('visible');
+                showToast('Welcome, Admin!', 'success');
+                refreshData();
+            } else {
+                showToast('Invalid admin key', 'error');
+            }
+        }
+
+        function refreshData() {
+            if (!FIREBASE_CONFIG.databaseURL) {
+                showToast('No Firebase URL configured', 'error');
+                renderLeaderboard();
+                return;
+            }
+
+            showToast('Loading data...', 'info');
+            fetch(`${FIREBASE_CONFIG.databaseURL}/quiz_results.json`)
+                .then(r => r.json())
+                .then(data => {
+                    allResults = [];
+                    if (data) {
+                        // data has keys: round1, round2_set1, round2_set2
+                        for (const roundKey of Object.keys(data)) {
+                            const entries = data[roundKey];
+                            if (entries) {
+                                for (const [fbKey, entry] of Object.entries(entries)) {
+                                    allResults.push({ ...entry, fbKey: fbKey, fbRound: roundKey });
+                                }
+                            }
+                        }
+                    }
+                    showToast(`Loaded ${allResults.length} submissions`, 'success');
+                    renderLeaderboard();
+                })
+                .catch(() => {
+                    showToast('Failed to fetch data', 'error');
+                    renderLeaderboard();
+                });
+        }
+
+        function filterRound(round, btn) {
+            currentFilter = round;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            let data = currentFilter === 0 ? [...allResults] : allResults.filter(r => r.round === currentFilter);
+            data.sort((a, b) => b.score - a.score || a.time - b.time);
+
+            // Stats
+            document.getElementById('totalTeams').textContent = data.length;
+            if (data.length > 0) {
+                const avg = Math.round(data.reduce((s, r) => s + (r.score / r.total) * 100, 0) / data.length);
+                document.getElementById('avgScore').textContent = avg + '%';
+                document.getElementById('topScore').textContent = data[0].score + '/' + data[0].total;
+            } else {
+                document.getElementById('avgScore').textContent = '—';
+                document.getElementById('topScore').textContent = '—';
+            }
+
+            const tbody = document.getElementById('leaderboardBody');
+            const empty = document.getElementById('emptyState');
+
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            tbody.innerHTML = data.map((r, i) => {
+                const rank = i + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                const medals = ['🥇', '🥈', '🥉'];
+                const medal = rank <= 3 ? medals[rank - 1] : rank;
+                const m = Math.floor(r.time / 60);
+                const s = r.time % 60;
+                const idx = allResults.indexOf(r);
+
+                return `<tr>
+          <td><span class="rank-badge ${rankClass}">${medal}</span></td>
+          <td><span class="team-name">${r.team}</span></td>
+          <td><span style="font-size:0.75rem;color:var(--gold)">${ROUND_NAMES[r.round] || 'R' + r.round}</span></td>
+          <td><span class="score-cell">${r.score}/${r.total}</span></td>
+          <td style="font-size:0.8rem;color:#888">${m}m ${s}s</td>
+          <td><button class="btn-winner ${r.winner ? 'selected' : ''}" onclick="toggleWinner(${idx})">${r.winner ? '🏆 Winner' : 'Select'}</button></td>
+        </tr>`;
+            }).join('');
+        }
+
+        function toggleWinner(idx) {
+            const r = allResults[idx];
+            r.winner = !r.winner;
+            const team = r.team;
+
+            if (r.winner) {
+                showToast(`🏆 ${team} marked as winner!`, 'success');
+            } else {
+                showToast(`${team} unmarked`, 'info');
+            }
+
+            // Save winner status to Firebase
+            if (FIREBASE_CONFIG.databaseURL && r.fbKey && r.fbRound) {
+                fetch(`${FIREBASE_CONFIG.databaseURL}/quiz_results/${r.fbRound}/${r.fbKey}/winner.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(r.winner)
+                }).catch(() => { });
+            }
+
+            renderLeaderboard();
+        }
+    </script>
+</body>
+
+</html>
